@@ -1,6 +1,7 @@
 package com.github.alien11689.osgi.util.groovyconfig.impl
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.apache.aries.blueprint.annotation.bean.Bean
 import org.apache.aries.blueprint.annotation.service.Service
 import org.apache.aries.blueprint.annotation.service.ServiceProperty
@@ -11,6 +12,7 @@ import org.apache.felix.cm.PersistenceManager
 @Service(classes = [PersistenceManager], ranking = 100, properties = [
         @ServiceProperty(name = 'service.pid', values = ['com.github.alien11689.osgi.util.groovyconfig.impl.GroovyConfigPersistenceManager'])
 ])
+@Slf4j
 class GroovyConfigPersistenceManager implements PersistenceManager {
 
     private static final File configDir = new File(System.getProperty('karaf.etc'))
@@ -22,7 +24,7 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
 
     @Override
     Dictionary load(String pid) throws IOException {
-        println("Loading $pid")
+        log.debug("Loading $pid")
         GroovyShell gs = new GroovyShell()
         ConfigObject co = new ConfigSlurper().parse(gs.parse(getFile(pid)))
         Hashtable dictionary = new Hashtable(co.toProperties() as Map)
@@ -32,7 +34,7 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
 
     @Override
     Enumeration getDictionaries() throws IOException {
-        println("Get dictionaries")
+        log.debug('Getting dictionaries')
         List<Dictionary> dictionaries = configDir.list { dir, name -> name ==~ /.+\.groovy$/ }
                 .collect { String name -> name.split(/\./)[0..-2].join('.') }
                 .collect { String pid -> load(pid) } as List<Dictionary>
@@ -41,7 +43,7 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
 
     @Override
     void store(String pid, Dictionary dictionary) throws IOException {
-        println("Store $pid")
+        log.debug("Storing $pid")
         Properties properties = new Properties()
         Enumeration keys = dictionary.keys()
         while (keys.hasMoreElements()) {
@@ -52,12 +54,12 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
             properties[k] = dictionary.get(k)
         }
         new ConfigSlurper().parse(properties).writeTo(new FileWriter(getFile(pid)))
-        println('ok')
+        log.debug("Successfully stored $pid")
     }
 
     @Override
     void delete(String pid) throws IOException {
-        println("Delete $pid")
+        log.debug("Deleting $pid")
         File file = getFile(pid)
         if (file.exists()) {
             file.delete()
