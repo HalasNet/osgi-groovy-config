@@ -1,9 +1,16 @@
 package com.github.alien11689.osgi.util.groovyconfig.impl
 
 import groovy.transform.CompileStatic
+import org.apache.aries.blueprint.annotation.bean.Bean
+import org.apache.aries.blueprint.annotation.service.Service
+import org.apache.aries.blueprint.annotation.service.ServiceProperty
 import org.apache.felix.cm.PersistenceManager
 
 @CompileStatic
+@Bean
+@Service(classes = [PersistenceManager], ranking = 100, properties = [
+        @ServiceProperty(name = 'service.pid', values = ['com.github.alien11689.osgi.util.groovyconfig.impl.GroovyConfigPersistenceManager'])
+])
 class GroovyConfigPersistenceManager implements PersistenceManager {
 
     private static final File configDir = new File(System.getProperty('karaf.etc'))
@@ -27,8 +34,8 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
     Enumeration getDictionaries() throws IOException {
         println("Get dictionaries")
         List<Dictionary> dictionaries = configDir.list { dir, name -> name ==~ /.+\.groovy$/ }
-            .collect { String name -> name.split(/\./)[0..-2].join('.') }
-            .collect { String pid -> load(pid) }
+                .collect { String name -> name.split(/\./)[0..-2].join('.') }
+                .collect { String pid -> load(pid) } as List<Dictionary>
         return new DictionaryEnumeration(dictionaries)
     }
 
