@@ -9,26 +9,37 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
+    <properties>
+        <org.apache.felix.configadmin.version>1.8.8</org.apache.felix.configadmin.version>
+        <groovy-all.version>2.4.12</groovy-all.version>
+        <blueprint-maven-plugin-annotation.version>1.3.0</blueprint-maven-plugin-annotation.version>
+        <slf4j-api.version>1.7.25</slf4j-api.version>
+        <maven-bundle-plugin.version>2.5.4</maven-bundle-plugin.version>
+        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+        <gmavenplus-plugin.version>1.5</gmavenplus-plugin.version>
+        <blueprint-maven-plugin.version>1.9.0</blueprint-maven-plugin.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.configadmin</artifactId>
-            <version>1.8.8</version>
+            <version>${org.apache.felix.configadmin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.4.7</version>
+            <version>${groovy-all.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>blueprint-maven-plugin-annotation</artifactId>
-            <version>1.3.0</version>
+            <version>${blueprint-maven-plugin-annotation.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>${slf4j-api.version}</version>
         </dependency>
     </dependencies>
 
@@ -37,17 +48,14 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.5.4</version>
+                <version>${maven-bundle-plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <failOnError>true</failOnError>
                     <failOnWarning>true</failOnWarning>
                     <instructions>
-                        <!--<DynamicImport-Package>*</DynamicImport-Package>-->
                         <Import-Package>
                             !org.apache.aries.blueprint.annotation*,
-                            org.codehaus.groovy.runtime.callsite,
-                            groovy.lang,
                             *
                         </Import-Package>
                     </instructions>
@@ -55,7 +63,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -65,7 +73,7 @@
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>1.5</version>
+                <version>${gmavenplus-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -98,7 +106,7 @@
             <plugin>
                 <groupId>org.apache.aries.blueprint</groupId>
                 <artifactId>blueprint-maven-plugin</artifactId>
-                <version>1.9.0</version>
+                <version>${blueprint-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>

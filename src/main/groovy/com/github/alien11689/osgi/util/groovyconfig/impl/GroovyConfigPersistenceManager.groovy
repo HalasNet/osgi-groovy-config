@@ -19,6 +19,7 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
 
     @Override
     boolean exists(String pid) {
+        log.debug("Checking $pid existence")
         return getFile(pid).exists()
     }
 
@@ -29,6 +30,7 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
         ConfigObject co = new ConfigSlurper().parse(gs.parse(getFile(pid)))
         Hashtable dictionary = new Hashtable(co.toProperties() as Map)
         dictionary.put('service.pid', pid)
+        log.debug("Loaded $pid")
         return dictionary
     }
 
@@ -36,9 +38,13 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
     Enumeration getDictionaries() throws IOException {
         log.debug('Getting dictionaries')
         List<Dictionary> dictionaries = configDir.list { dir, name -> name ==~ /.+\.groovy$/ }
-                .collect { String name -> name.split(/\./)[0..-2].join('.') }
+                .collect { String name -> removeExtension(name) }
                 .collect { String pid -> load(pid) } as List<Dictionary>
         return new DictionaryEnumeration(dictionaries)
+    }
+
+    private static String removeExtension(String name) {
+        return name.split(/\./)[0..-2].join('.')
     }
 
     @Override
@@ -54,7 +60,7 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
             properties[k] = dictionary.get(k)
         }
         new ConfigSlurper().parse(properties).writeTo(new FileWriter(getFile(pid)))
-        log.debug("Successfully stored $pid")
+        log.debug("Stored $pid")
     }
 
     @Override
@@ -63,6 +69,9 @@ class GroovyConfigPersistenceManager implements PersistenceManager {
         File file = getFile(pid)
         if (file.exists()) {
             file.delete()
+            log.debug("Deleted $pid")
+        } else {
+            log.debug("File not found for $pid")
         }
     }
 
